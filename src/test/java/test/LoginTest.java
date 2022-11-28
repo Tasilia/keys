@@ -1,18 +1,14 @@
 package test;
 
-import com.codeborne.selenide.Configuration;
 import com.codeborne.selenide.SelenideElement;
 import data.DataHelper;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import page.LoginPage;
 
 import static com.codeborne.selenide.Condition.*;
-import static com.codeborne.selenide.Selenide.$x;
 import static com.codeborne.selenide.Selenide.open;
 
 public class LoginTest {
@@ -20,17 +16,19 @@ public class LoginTest {
     void setup() {
         open("https://kluchi.staging.pqlab.dev/login");
     }
+
     @ParameterizedTest
     @ValueSource(strings = {"", "f.h("})
-    void enterWithoutPhone(String phone){
+    void enterWithoutPhone(String phone) {
         LoginPage loginPage = new LoginPage();
         loginPage.enterPhone(phone);
         loginPage.enter();
         loginPage.getErrorMessage().shouldHave(text("Требуется значение"));
         loginPage.getErrorMessage().shouldHave(cssValue("color", "rgba(209, 67, 67, 1)"));
     }
+
     @Test
-    void enterWithWrongPhoneFormat(){
+    void enterWithWrongPhoneFormat() {
         LoginPage loginPage = new LoginPage();
         loginPage.enterPhone("4");
         loginPage.enter();
@@ -54,7 +52,7 @@ public class LoginTest {
     @ValueSource(strings = {"", "f.h("})
     void enterWithoutCode(String code) {
         LoginPage loginPage = new LoginPage();
-        loginPage.enterPhone(DataHelper.getAuthInfo().getPhone());
+        loginPage.enterPhone(DataHelper.getCorrectPhone());
         loginPage.enter();
         loginPage.enterCode(code);
         loginPage.enter();
@@ -65,48 +63,63 @@ public class LoginTest {
     @Test
     void enterWithIncorrectCode() {
         LoginPage loginPage = new LoginPage();
-        loginPage.enterPhone(DataHelper.getAuthInfo().getPhone());
+        loginPage.enterPhone(DataHelper.getCorrectPhone());
         loginPage.enter();
-        loginPage.enterCode("1222");
+        loginPage.enterCode(DataHelper.getWrongCode());
         loginPage.enter();
         loginPage.getNotificationMessage().shouldHave(text("Неверный проверочный код"));
         loginPage.getNotificationMessage().shouldHave(cssValue("color", "rgba(87, 41, 41, 1)"));
     }
+
     @Test
     void enterWithCorrectCode() {
         LoginPage loginPage = new LoginPage();
-        loginPage.enterPhone(DataHelper.getAuthInfo().getPhone());
+        loginPage.enterPhone(DataHelper.getCorrectPhone());
         loginPage.enter();
-        loginPage.enterCode(DataHelper.getAuthInfo().getCode());
+        loginPage.enterCode(DataHelper.getCorrectCode());
         loginPage.enter();
         loginPage.getNotificationMessage().shouldHave(text("Введите пароль"));
         loginPage.getNotificationMessage().shouldHave(cssValue("color", "rgba(40, 72, 98, 1)"));
         loginPage.getPasswordField().shouldBe(visible);
         loginPage.getLabelPassword().shouldHave(text("Пароль"));
     }
+
     @Test
     void enterWithoutPassword() {
         LoginPage loginPage = new LoginPage();
-        loginPage.enterPhone(DataHelper.getAuthInfo().getPhone());
+        loginPage.enterPhone(DataHelper.getCorrectPhone());
         loginPage.enter();
-        loginPage.enterCode(DataHelper.getAuthInfo().getCode());
+        loginPage.enterCode(DataHelper.getCorrectCode());
         loginPage.enter();
         loginPage.enter();
         loginPage.getErrorMessage().shouldHave(text("Требуется значение"));
         loginPage.getErrorMessage().shouldHave(cssValue("color", "rgba(209, 67, 67, 1)"));
     }
+
     @Test
     void enterWithIncorrectPassword() {
         LoginPage loginPage = new LoginPage();
-        loginPage.enterPhone(DataHelper.getAuthInfo().getPhone());
+        loginPage.enterPhone(DataHelper.getCorrectPhone());
         loginPage.enter();
-        loginPage.enterCode(DataHelper.getAuthInfo().getCode());
+        loginPage.enterCode(DataHelper.getCorrectCode());
         loginPage.enter();
-        loginPage.enterPassword("qwerty");
+        loginPage.enterPassword(DataHelper.getWrongPassword());
         loginPage.enter();
         loginPage.getNotificationMessage().shouldHave(text("Неверный пароль"));
-        loginPage.getNotificationMessage().shouldHave(cssValue("color","rgba(87, 41, 41, 1)"));
+        loginPage.getNotificationMessage().shouldHave(cssValue("color", "rgba(87, 41, 41, 1)"));
     }
+
+    @Test
+    void enterWithIncorrectPhone() {
+        LoginPage loginPage = new LoginPage();
+        loginPage.enterPhone(DataHelper.getWrongPhone());
+        loginPage.enter();
+        loginPage.enterCode(DataHelper.getCorrectCode());
+        loginPage.enter();
+        loginPage.getNotificationMessage().shouldHave(text("Пользователь не найден"));
+        loginPage.getNotificationMessage().shouldHave(cssValue("color", "rgba(87, 41, 41, 1)"));
+    }
+
     @Test
     void selectAustraliaPhoneCode() {
         LoginPage loginPage = new LoginPage();
@@ -114,6 +127,7 @@ public class LoginTest {
         loginPage.getAUPhoneIndex().shouldBe(visible);
         loginPage.getAuFlag().shouldBe(visible);
     }
+
     @Test
     void searchCountry() {
         LoginPage loginPage = new LoginPage();
@@ -122,10 +136,5 @@ public class LoginTest {
         australiaButton.shouldBe(visible);
         loginPage.searchCountry("Бельгия");
         australiaButton.shouldNotBe(visible);
-    }
-    @Test
-    void login() {
-        LoginPage loginPage = new LoginPage();
-        loginPage.login();
     }
 }

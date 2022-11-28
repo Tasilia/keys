@@ -26,7 +26,8 @@ public class LoginPage {
     private SelenideElement auPhoneIndex = $x("//div[contains(text(), \"+61\")]");
     private SelenideElement auFlag = $x("//span[@data-testid=\"AU\"]");
     private SelenideElement searchField = $x("//input[@id=\":r4:\"]");
-    public LoginPage(){
+
+    public LoginPage() {
         title.shouldBe(visible);
         title.shouldHave(text("Вход"));
         title2.shouldBe(visible);
@@ -39,24 +40,31 @@ public class LoginPage {
     public SelenideElement getValidationCodeField() {
         return validationCodeField;
     }
+
     public SelenideElement getAustraliaButton() {
         return australiaButton;
     }
+
     public SelenideElement getAUPhoneIndex() {
         return auPhoneIndex;
     }
+
     public SelenideElement getAuFlag() {
         return auFlag;
     }
+
     public SelenideElement getPasswordField() {
         return passwordField;
     }
+
     public SelenideElement getLabelCode() {
         return labelCode;
     }
+
     public SelenideElement getLabelPassword() {
         return labelPassword;
     }
+
     public SelenideElement getNotificationMessage() {
         return notificationMessage;
     }
@@ -65,35 +73,43 @@ public class LoginPage {
         return errorMessage;
     }
 
-    public void enterPhone(String phone){
+    public void enterPhone(String phone) {
         phoneField.setValue(phone);
     }
-    public void enterPassword(String password){
+
+    public void enterPassword(String password) {
         passwordField.setValue(password);
     }
-    public void enterCode(String code){
+
+    public void enterCode(String code) {
         validationCodeField.setValue(code);
     }
+
     public void enter() {
         enterButton.click();
     }
+
     public void selectCountryClick() {
         selectCountryButton.click();
         searchField.shouldBe(visible);
     }
+
     public void selectAustralia() {
         selectCountryClick();
         australiaButton.click();
     }
+
     public void searchCountry(String country) {
         searchField.setValue(country);
     }
-    public void login() {
-        enterPhone(DataHelper.getAuthInfo().getPhone());
+
+    public TasksPage login() {
+        enterPhone(DataHelper.getCorrectPhone());
         enter();
-        enterCode(DataHelper.getAuthInfo().getCode());
+        enterCode(DataHelper.getCorrectCode());
         enter();
-        enterPassword(DataHelper.getAuthInfo().getPassword());
+        enterPassword(DataHelper.getCorrectPassword());
         enter();
+        return new TasksPage();
     }
 }
